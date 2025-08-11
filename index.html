@@ -32,4 +32,132 @@
         input {
             width: calc(100% - 16px);
             padding: 8px;
-            m
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .date-row {
+            display: flex;
+            gap: 6px;
+        }
+        .date-row input {
+            flex: 1;
+        }
+        .date-row button {
+            padding: 8px 12px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .date-row button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e1e4e8;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>mg/kg Berekening</h2>
+
+    <label>Startdatum:
+        <input type="date" id="startdatum">
+    </label>
+
+    <label>Einddatum:
+        <div class="date-row">
+            <input type="date" id="einddatum">
+            <button type="button" onclick="setToday()">Vandaag</button>
+        </div>
+    </label>
+
+    <label>Dagdosering (mg):
+        <input type="number" id="dagdosering" step="0.01">
+    </label>
+
+    <label>Gewicht patiënt (kg):
+        <input type="number" id="gewicht" step="0.01">
+    </label>
+
+    <div class="result" id="resultaat">Voer gegevens in...</div>
+</div>
+
+<script>
+    const startdatum = document.getElementById('startdatum');
+    const einddatum = document.getElementById('einddatum');
+    const dagdosering = document.getElementById('dagdosering');
+    const gewicht = document.getElementById('gewicht');
+    const resultaat = document.getElementById('resultaat');
+
+    function setToday() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        einddatum.value = `${yyyy}-${mm}-${dd}`;
+        bereken();
+    }
+
+    function bereken() {
+        const start = new Date(startdatum.value);
+        const eind = new Date(einddatum.value);
+        const dosis = parseFloat(dagdosering.value);
+        const kg = parseFloat(gewicht.value);
+
+        if (isNaN(dosis) || isNaN(kg) || !startdatum.value || !einddatum.value) {
+            resultaat.textContent = "Voer alle gegevens in...";
+            return;
+        }
+
+        const dagen = Math.ceil((eind - start) / (1000 * 60 * 60 * 24)) + 1;
+        if (dagen < 1) {
+            resultaat.textContent = "Einddatum moet na startdatum liggen.";
+            return;
+        }
+
+        const totaalMg = dosis * dagen;
+        const mgPerKg = totaalMg / kg;
+
+        // Bereken hoeveel dagen nodig zijn voor 120 mg/kg
+        const totaalVoorDoel = 120 * kg; // in mg
+        const mgNodig = totaalVoorDoel - totaalMg;
+
+        let extraMaanden = 0;
+        let extraDagen = 0;
+        if (mgNodig > 0) {
+            const dagenNodig = Math.ceil(mgNodig / dosis);
+            extraMaanden = Math.floor(dagenNodig / 30);
+            extraDagen = dagenNodig % 30;
+        }
+
+        let voorspellingTekst = "";
+        if (mgNodig <= 0) {
+            voorspellingTekst = "<span class='highlight'>Doel van 120 mg/kg is al bereikt 🎉</span>";
+        } else {
+            voorspellingTekst = `Nog ongeveer <span class='highlight'>${extraMaanden} maand(en) en ${extraDagen} dag(en)</span> nodig voor 120 mg/kg.`;
+        }
+
+        resultaat.innerHTML = `
+            Aantal dagen: <span class='highlight'>${dagen}</span><br>
+            Totaal mg/kg: <span class='highlight'>${mgPerKg.toFixed(2)}</span><br>
+            ${voorspellingTekst}
+        `;
+    }
+
+    [startdatum, einddatum, dagdosering, gewicht].forEach(input => {
+        input.addEventListener('input', bereken);
+    });
+</script>
+</body>
+</html>
