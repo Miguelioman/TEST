@@ -6,77 +6,30 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            max-width: 500px;
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
         }
-        label { display: block; margin-top: 10px; }
-        input {
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 450px;
             width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            box-sizing: border-box;
         }
-        .result {
-            margin-top: 20px;
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 12px;
             font-weight: bold;
-            font-size: 1.2em;
         }
-    </style>
-</head>
-<body>
-    <h2>mg/kg Berekening</h2>
-
-    <label>Startdatum:
-        <input type="date" id="startdatum">
-    </label>
-
-    <label>Einddatum:
-        <input type="date" id="einddatum">
-    </label>
-
-    <label>Dagdosering (mg):
-        <input type="number" id="dagdosering" step="0.01">
-    </label>
-
-    <label>Gewicht patiënt (kg):
-        <input type="number" id="gewicht" step="0.01">
-    </label>
-
-    <div class="result" id="resultaat">Voer gegevens in...</div>
-
-    <script>
-        const startdatum = document.getElementById('startdatum');
-        const einddatum = document.getElementById('einddatum');
-        const dagdosering = document.getElementById('dagdosering');
-        const gewicht = document.getElementById('gewicht');
-        const resultaat = document.getElementById('resultaat');
-
-        function bereken() {
-            const start = new Date(startdatum.value);
-            const eind = new Date(einddatum.value);
-            const dosis = parseFloat(dagdosering.value);
-            const kg = parseFloat(gewicht.value);
-
-            if (isNaN(dosis) || isNaN(kg) || !startdatum.value || !einddatum.value) {
-                resultaat.textContent = "Voer alle gegevens in...";
-                return;
-            }
-
-            const dagen = Math.ceil((eind - start) / (1000 * 60 * 60 * 24)) + 1;
-            if (dagen < 1) {
-                resultaat.textContent = "Einddatum moet na startdatum liggen.";
-                return;
-            }
-
-            const totaalMg = dosis * dagen;
-            const mgPerKg = totaalMg / kg;
-
-            resultaat.textContent = `Aantal dagen: ${dagen} | Totaal mg/kg: ${mgPerKg.toFixed(2)}`;
-        }
-
-        [startdatum, einddatum, dagdosering, gewicht].forEach(input => {
-            input.addEventListener('input', bereken);
-        });
-    </script>
-</body>
-</html>
+        input {
+            width: calc(100% - 16px);
+            padding: 8px;
+            m
